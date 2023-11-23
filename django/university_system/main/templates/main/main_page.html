@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>University system</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <style> tr {background-color: #8adbec;} </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+</head>
+<body>
+<div class="container">
+    <main id="main-holder">
+        <h1><a href='/admin'>Панель администратора<span id="icon0" style="display:inline-block;"></span></a></h1>
+        <h1><a href='#' id="show-students">Студенты<span id="icon1" style="display:inline-block;">▼</span></a></h1>
+        <div id="students-table" style="display:block;">
+            <table class="table table-striped" border="1" width="1200">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>ФИО</th>
+                        <th>Дата рождения</th>
+                        <th>Университет</th>
+                        <th>Год поступления</th>
+                        <th>Опция</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for student in students %}
+                <tr>
+                    <td>{{ student.id }}</td>
+                    <td class="editable" data-id="{{ student.id }}" data-field="name">{{ student.name }}</td>
+                    <td class="editable" data-id="{{ student.id }}" data-field="date_born">{{ student.date }}</td>
+                    <td class="editable" data-id="{{ student.id }}" data-field="university">{{ student.university }}</td>
+                    <td class="editable" data-id="{{ student.id }}" data-field="year">{{ student.year }}</td>
+                    <td><a class="btn btn-info" href="delete_student/{{student.id}}">Удалить</a></td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <a href="#" id="create-student">Добавить студента<span id="icon3" style="display:inline-block;">►</span></a>
+            <div id="create-student-form" style="display:none;">
+                <form method="POST">{% csrf_token %}
+                <table>
+                    {{ student_form.as_table }}
+                </table>
+                <input class="btn btn-info" type="submit" value="Отправить">
+                </form>
+            </div>
+        </div>
+        <h1><a href='#' id="show-universities">Университеты<span id="icon2" style="display:inline-block;">▼</span></a></h1>
+        <div id="universities-table" style="display:block;">
+            <table class="table table-striped" border="1" width="1200">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Полное название</th>
+                        <th>Сокращенное название</th>
+                        <th>Дата создания</th>
+                        <th>Опция</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for university in universities %}
+                    <tr>
+                        <td>{{ university.id }}</td>
+                        <td class="editable" data-id="{{ university.id }}" data-field="full_name">{{ university.full_name }}</td>
+                        <td class="editable" data-id="{{ university.id}}" data-field="small_name">{{ university.small_name }}</td>
+                        <td class="editable" data-id="{{ university.id }}" data-field="date_create">{{ university.date }}</td>
+                        <td><a class="btn btn-info" href="delete_university/{{university.id}}">Удалить</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <a href="#" id="create-university">Добавить университет<span id="icon4" style="display:inline-block;">►</span></a>
+            <div id="create-university-form" style="display:none;">
+                <form method="POST">{% csrf_token %}
+                <table>
+                    {{ university_form.as_table }}
+                </table>
+                <input class="btn btn-info" type="submit" value="Отправить">
+                </form>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+   $(document).ready(function(){
+       $("#show-students").click(function(){
+          $("#students-table").toggle();
+          if ($('#students-table').is(':visible')) {
+              $('#icon1').html('▼');
+          } else {
+              $('#icon1').html('►');
+          }
+       });
+      $("#show-universities").click(function(){
+         $("#universities-table").toggle();
+         if ($('#universities-table').is(':visible')) {
+              $('#icon2').html('▼');
+         } else {
+              $('#icon2').html('►');
+         }
+      });
+       $("#create-student").click(function(){
+           $("#create-student-form").toggle();
+           if ($('#create-student-form').is(':visible')) {
+              $('#icon3').html('▼');
+         } else {
+              $('#icon3').html('►');
+         }
+       });
+     $("#create-university").click(function(){
+         $("#create-university-form").toggle();
+         if ($('#create-university-form').is(':visible')) {
+              $('#icon4').html('▼');
+         } else {
+              $('#icon4').html('►');
+         }
+       });
+     $(document).ready(function() {
+});
+ });
+  flatpickr(".datepicker", {dateFormat: "Y-m-d",});
+</script>
+<script>
+    const editableFields = document.querySelectorAll('.editable');
+
+    editableFields.forEach(field => {
+        field.addEventListener('click', () => {
+            const value = field.textContent.trim();
+            field.innerHTML = `<input type="text" value="${value}">`;
+
+            const inputField = field.querySelector('input');
+
+            inputField.addEventListener('blur', () => {
+                const newValue = inputField.value.trim();
+
+                field.textContent = newValue;
+
+                const entityId = field.dataset.id;
+                const fieldName = field.getAttribute('data-field');
+                const csrfToken = document.getElementsByName('csrfmiddlewaretoken')[0].value;
+
+                const isStudent = fieldName !== 'full_name' && fieldName !== 'small_name' && fieldName !== 'date_create';
+                const url = isStudent ? `/update_student/${entityId}/` : `/update_university/${entityId}/`;
+
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken,
+                    },
+                    body: JSON.stringify({
+                        field: fieldName,
+                        value: newValue,
+                    }),
+                });
+            });
+
+            inputField.focus();
+        });
+    });
+</script>
+</body>
+</html>

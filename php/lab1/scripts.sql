@@ -1,0 +1,109 @@
+#1
+SELECT * FROM cust WHERE SNUM=1001;
+#2
+SELECT CITY, SNAME, SNUM, COMM FROM sal;
+#3
+SELECT RATING, CNAME FROM cust WHERE CITY='San Jose';
+#4
+SELECT DISTINCT SNUM FROM ord;
+#5
+SELECT SNAME, CITY FROM sal WHERE CITY='London' AND COMM > 0.11;
+#6
+SELECT * FROM cust WHERE RATING<=200 AND CITY NOT LIKE 'Rome';
+#7.a
+SELECT * FROM ord WHERE ODATE='03-OCT-90' OR ODATE='05-OCT-90';
+#7.b
+SELECT * FROM ord WHERE ODATE!='04-OCT-90' AND ODATE!='06-OCT-90';
+#8
+SELECT * FROM cust WHERE CNAME RLIKE '^[A-G]';
+#9
+SELECT * FROM sal WHERE SNAME LIKE '%e%';
+#10
+SELECT SUM(AMT) FROM ord WHERE ODATE='03-OCT-90';
+#11
+SELECT SUM(AMT) FROM ord WHERE SNUM=1001;
+#12
+SELECT MAX(AMT), SNUM FROM ord GROUP BY SNUM;
+#13
+SELECT MIN(CNAME) AS name FROM cust WHERE CNAME LIKE '%s';
+#14
+SELECT AVG(COMM), CITY FROM sal GROUP BY CITY;
+#15
+SELECT ONUM, AMT * 0.8 AS AWT_EUR, S.SNAME, S.COMM * ORD.AMT AS COMM
+FROM ORD
+         INNER JOIN SAL S ON ORD.SNUM = S.SNUM
+WHERE ODATE = '03-OCT-90';
+#16
+SELECT O.ONUM, OCS.CNAME, OCS.SNAME, OCS.CITY
+FROM ORD O
+         LEFT JOIN(
+         SELECT O2.ONUM, C.CNAME, S.SNAME, S.CITY
+         FROM ORD O2
+                  LEFT JOIN CUST C ON O2.CNUM = C.CNUM
+                  INNER JOIN SAL S ON C.SNUM = S.SNUM
+         WHERE S.CITY = 'London'
+            OR 'Rome'
+         ) AS OCS ON O.ONUM = OCS.ONUM
+ORDER BY O.ONUM;
+#17
+SELECT s.sname, SUM(o.amt) AS total_orders, SUM(o.amt * s.comm) AS total_commission
+FROM sal s
+         JOIN ord o ON s.snum = o.snum
+WHERE o.odate < '05-OCT-90'
+GROUP BY s.sname
+ORDER BY s.sname;
+#18
+SELECT O.ONUM, O.AMT, C.CNAME, C.CITY, S.SNAME, S.CITY
+FROM ORD AS O
+         INNER JOIN CUST C ON O.CNUM = C.CNUM
+         INNER JOIN SAL S ON C.SNUM = S.SNUM
+WHERE C.CITY RLIKE '^[L-R]'
+  AND S.CITY RLIKE '^[L-R]';
+#19
+WITH A AS
+         (SELECT O.ONUM AS FIRST, O2.ONUM AS SECOND, C.CNAME AS CNAME_1, C2.CNAME AS CNAME_2
+          FROM ORD O
+                   INNER JOIN ORD O2 ON O.SNUM = O2.SNUM
+                   INNER JOIN CUST C ON O.CNUM = C.CNUM
+                   INNER JOIN CUST C2 ON O2.CNUM = C2.CNUM
+          WHERE O.ONUM < O2.ONUM
+            AND C.CNAME != C2.CNAME)
+SELECT DISTINCT a.CNAME_1, a.CNAME_2
+FROM A;
+#20
+WITH a1 AS (
+    SELECT s.snum, s.comm
+    FROM SAL s
+    WHERE s.comm < 0.13
+),
+     a2 AS (
+         SELECT DISTINCT c.cname, o.snum
+         FROM CUST c
+                  INNER JOIN ORD o ON c.cnum = o.cnum
+     )
+SELECT a2.cname, a1.snum
+FROM a2
+         INNER JOIN a1 ON a2.snum = a1.snum;
+#21
+DROP TABLE IF EXISTS sal_copy;
+CREATE TABLE sal_copy
+AS SELECT * FROM sal;
+DESC sal;
+DESC sal_copy;
+#22
+INSERT INTO sal_copy
+VALUES (1007, 'Jorge', 'London', 0.2);
+INSERT INTO sal_copy
+VALUES (1006, 'Veronica', 'London', 0.14);
+SELECT * FROM sal_copy;
+DELETE FROM sal_copy WHERE snum = 1006;
+SELECT * FROM sal_copy;
+#23
+INSERT INTO sal_copy
+VALUES (1018, 'Nickolay', 'Ivanov', 0.06);
+SELECT * FROM sal_copy;
+INSERT INTO sal_copy
+VALUES (1008, 'Petr', 'Moscow', 0.17);
+SELECT * FROM sal_copy;
+UPDATE sal_copy SET comm = comm*2;
+SELECT * FROM sal_copy;
