@@ -1,14 +1,10 @@
-def main():
-    path_to_file = str(input("Enter path to file: "))
-    offset = int(input("Enter offset in number of symbols: "))
-    language = str(input("Enter language: "))
-
-    if language.lower() in ["russian"]:
+def chesar(path_to_file, offset, language):
+    if language.lower() in ["russian"] and 0 <= offset <= 32:
         dictionary_lower, dictionary_upper = "абвгдеёжзийклмнопрстуфхцчшщъыьэюя", "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ"
-    elif language.lower() in ["english"]:
+    elif language.lower() in ["english"] and 0 <= offset <= 25:
         dictionary_lower, dictionary_upper = "abcdefghijklmnopqrstuvwxyz", "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
     else:
-        print("Your language not supported")
+        print("Incorrect input data")
         return
 
     try:
@@ -31,15 +27,27 @@ def main():
 
         for j in range(len(dictionary)):
             if file_text[i] == dictionary[j]:
-                if j + offset < 0:
-                    caesar_cipher.append(dictionary[(j + offset) % len(dictionary)])
-                elif j + offset >= len(dictionary):
-                    caesar_cipher.append(dictionary[(1 - j - offset) % (len(dictionary) - 1)])
+                if j + offset >= len(dictionary):
+                    caesar_cipher.append(dictionary[(j + offset) % (len(dictionary))])
                 elif 0 <= j + offset < len(dictionary):
                     caesar_cipher.append(dictionary[j + offset])
 
     with open("resources/result_file.txt", "w", encoding='utf-8') as file:
         print(''.join(caesar_cipher), file=file)
+
+    result = ''
+    for symbol in caesar_cipher:
+        result += symbol
+
+    return result
+
+
+def main():
+    # path_to_file = str(input("Enter path to file: "))
+    # offset = int(input("Enter offset in number of symbols: "))
+    # language = str(input("Enter language: "))
+
+    chesar("resources/test_file.txt", 12, "russian")
 
 
 main()
